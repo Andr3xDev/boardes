@@ -13,7 +13,7 @@ export default function BoardPage() {
 
     return (
         <main className="p-4 flex items-center justify-center">
-            <div className="mr-20 flex flex-col items-center gap-y-11">
+            <div className="mr-20 flex flex-col items-center justify-items-start gap-y-11">
                 <h1 className="text-4xl font-bold text-white">
                     -- Interactive Board --
                 </h1>

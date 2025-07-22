@@ -1,72 +1,79 @@
-// Definimos e exportamos la interfaz para que PizarraPage la pueda usar.
-export interface BrushOptions {
-    color: string;
-    strokeWeight: number;
-}
+import { useState, useRef, useEffect } from "react";
 
 interface ToolbarProps {
-    options: BrushOptions;
-    setOptions: (options: BrushOptions) => void;
+    color: string;
+    setColor: (color: string) => void;
+    strokeWeight: number;
+    setStrokeWeight: (weight: number) => void;
 }
 
-const ERASER_COLOR = "#FFFFFF";
+export function Toolbar({
+    color,
+    setColor,
+    strokeWeight,
+    setStrokeWeight,
+}: Readonly<ToolbarProps>) {
+    const [isErasing, setIsErasing] = useState(false);
+    const colorBeforeErasingRef = useRef(color);
 
-export function Toolbar({ options, setOptions }: ToolbarProps) {
-    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setOptions({ ...options, color: e.target.value });
-    };
+    useEffect(() => {
+        if (isErasing) {
+            if (color !== "#FFFFFF") {
+                setIsErasing(false);
+            }
+        } else {
+            colorBeforeErasingRef.current = color;
+        }
+    }, [color, isErasing]);
 
-    const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setOptions({ ...options, strokeWeight: parseInt(e.target.value, 10) });
-    };
-
-    const handleEraserClick = () => {
-        setOptions({ ...options, color: ERASER_COLOR });
+    const handleToggleEraser = () => {
+        if (isErasing) {
+            setColor(colorBeforeErasingRef.current);
+            setIsErasing(false);
+        } else {
+            setColor("#FFFFFF");
+            setIsErasing(true);
+        }
     };
 
     return (
-        <div className="bg-white p-4 rounded-xl shadow-md flex items-center gap-9 w-max">
+        <div className="space-y-4">
             <div>
-                <label
-                    htmlFor="color-picker"
-                    className="block text-sm font-medium text-slate-600 mb-1"
-                >
-                    Color
-                </label>
+                {" "}
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Color{" "}
+                </label>{" "}
                 <input
-                    id="color-picker"
                     type="color"
-                    value={options.color}
-                    onChange={handleColorChange}
-                    className="w-12 h-12 p-0 border-none rounded-full cursor-pointer bg-transparent"
-                />
-            </div>
-
-            <div className="flex-grow">
-                <label
-                    htmlFor="stroke-weight"
-                    className="block text-sm font-medium text-slate-600 mb-1"
-                >
-                    Thickness:{" "}
-                    <span className="font-bold">{options.strokeWeight}px</span>
-                </label>
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                    className="w-full h-10 p-1 bg-gray-700 border border-gray-600 rounded-md cursor-pointer"
+                />{" "}
+            </div>{" "}
+            <div>
+                {" "}
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Thickness: {strokeWeight}px{" "}
+                </label>{" "}
                 <input
-                    id="stroke-weight"
                     type="range"
                     min="1"
                     max="50"
-                    value={options.strokeWeight}
-                    onChange={handleWeightChange}
-                    className="h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                />
+                    value={strokeWeight}
+                    onChange={(e) => setStrokeWeight(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />{" "}
             </div>
-
             <button
-                onClick={handleEraserClick}
-                className="px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 transition-colors"
+                onClick={handleToggleEraser}
+                className={`w-full mt-4 px-4 py-2 font-semibold rounded-md transition-colors ${
+                    isErasing
+                        ? "bg-[#376349]  text-white"
+                        : "bg-[#275359] text-gray-200"
+                }`}
             >
-                Eraser
-            </button>
+                {isErasing ? "Brush" : "Eraser"}
+            </button>{" "}
         </div>
     );
 }
